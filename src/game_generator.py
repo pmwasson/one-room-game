@@ -1,7 +1,7 @@
 import textwrap
 
 def lineNumber(val):
-   return (val+1)
+   return (val+1)*1
 
 def label(ls):
    if (ls != ''):
@@ -319,7 +319,7 @@ def main():
    print("NEW")
    lineNum = 0;
    for line in asLines:
-      print("{:<5d} {}".format(lineNumber(lineNum),replaceVariables(line)))
+      print("{:<4d} {}".format(lineNumber(lineNum),replaceVariables(line)))
       lineNum+=1
 
 
