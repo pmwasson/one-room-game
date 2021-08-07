@@ -1,11 +1,14 @@
 import textwrap
 
+def lineNumber(val):
+   return (val+1)*10
+
 def label(ls):
    if (ls != ''):
       if ls in asLabel:
          print("REM * Warning: label {} redefined".format(ls))
-      asLabel[ls] = len(asLines)
-      print("REM label {}={}".format(ls,asLabel[ls]))
+      asLabel[ls] = lineNumber(len(asLines))
+      #print("REM label {}={}".format(ls,asLabel[ls]))
 
 def labelStr(ls):
    return "%{}%".format(ls)
@@ -52,6 +55,11 @@ def cmdSet(flag,cont=True):
    asLines.append('F({})=1'.format(labelStr(flag)))
    doCont(cont)
 
+def cmdClr(flag,cont=True):
+   checkFlag(flag)
+   asLines.append('F({})=0'.format(labelStr(flag)))
+   doCont(cont)
+
 def replaceVariables(line):
    cont = True
    while(cont):
@@ -87,6 +95,8 @@ def action(cmd):
          opt = 1
       if word not in tree:
          tree[word] = {}
+      if word not in synonymList:
+         synonymList[word] = [word]
       if (w == len(wordList)-1):
          tree[word]["!"] = act
       if (opt):
@@ -107,10 +117,11 @@ def parseTree(tree,prefix,level=0):
       if (key == "*"):
          final = tree[key]["!"]
       elif (type(tree[key]) is dict):
-         cmdInsert('IF W$({}) = "{}" GOTO {}: REM tree {}'.format(level,key.upper(),labelStr(plabel),plabel))
+         for word in synonymList[key]:
+            cmdInsert('IF W$({}) = "{}" GOTO {}'.format(level,word.upper(),labelStr(plabel)))
       else:
-         cmdInsert('IF C={} THEN GOTO {}: REM leaf {}'.format(level,labelStr(tree[key]),tree[key]))
-   cmdInsert('GOTO {}: REM default {}'.format(labelStr(final),final))
+         cmdInsert('IF C={} THEN GOTO {}'.format(level,labelStr(tree[key])))
+   cmdInsert('GOTO {}'.format(labelStr(final)))
 
    id=0
    for key in tree.keys():
@@ -120,6 +131,10 @@ def parseTree(tree,prefix,level=0):
          if (key != "*"):
             parseTree(tree[key],plabel,level+1)
 
+def synonym(base,word):
+   if base not in synonymList:
+      synonymList[base] = [base]
+   synonymList[base].append(word)
 
 def main():
    done = False
@@ -127,10 +142,14 @@ def main():
    #----------------
    # Game Start
    #----------------
-   cmdInsert('REM Written by Paul Wasson, August 2021')
+   cmdInsert('REM -------------------------------------')
+   cmdInsert('REM  TOY ROOM                           ')
+   cmdInsert('REM -------------------------------------')
+   cmdInsert('REM  Written by Paul Wasson, August 2021')
+   cmdInsert('REM -------------------------------------')
    cmdInsert('? CHR$(4);"PR#3"')
    cmdInsert('DIM F({})'.format(labelStr(flagCount)))
-   cmdPrint(            "Welcome to TOY ROOM, a tiny interactive fiction game to test out parsing text in AppleSoft")
+   cmdPrint(            "Welcome to TOY ROOM, a tiny interactive fiction game to test out parsing text in AppleSoft.")
    cmdPrint(            "")
    cmdInsert("GOTO {}".format(labelStr(start)))
 
@@ -151,9 +170,10 @@ def main():
    #----------------
 
    # Help
+   synonym("help","hint")
    label(action("help"))
-   label(action("hint"))
-   cmdPrint(            "Try using 2 word commands in upper case, like SIT CHAIR",done)
+   cmdPrint(            "Try using 2 word commands in upper case, like LOOK ROOM or SIT CHAIR. You can try longer commands like OPEN DOOR WITH KEY, but it is not generally needed.")
+   cmdPrint(            "Here are some word you can try: LOOK, SIT, STAND, GET, DROP, INVENTORY, OPEN, QUIT.",done)
 
    # Start
    label(action("new ?game"))
@@ -165,12 +185,14 @@ def main():
    cmdPrint(            "Your standing in a small room with a closed door.",done)
 
    # Look
+   synonym("look","examine")
    label(action("look ?room"))
    cmdPrint(            "The room is very small with a single door and a chair.",done)
 
    label(action("look door"))
    cmdPrint(            "It appears to be an ordinary locked door.",done)
 
+   synonym("chair","seat")
    label(action("look chair"))
    cmdPrint(            "It is a pretty boring metal chair with a worn seat and uncomforable back support.")
    cmdIfSetGoto("flagKey",prompt)
@@ -180,6 +202,10 @@ def main():
    label(action("look key"))
    cmdIfClrGoto("flagSit","noLook")   
    cmdPrint(            "It is a small copper colored key.",done)
+
+   synonym("me","self")
+   label(action("look me"))
+   cmdPrint(            "You seem ordinary.",done)
 
    label(action("look *"))
    label("noLook")
@@ -213,19 +239,37 @@ def main():
    label("alreadyGet")
    cmdPrint(            "You already have that!",done)
 
+   # Drop
+   label(action("drop key"))
+   cmdClr("flagKey")
+   cmdPrint(            "You drop the key and if falls back into the seat",done)
+
+   label(action("drop *"))
+   cmdPrint(            "You can't drop that!",done)
+
+   # Inventory
+   label(action("inventory"))
+   cmdIfClrGoto("flagKey","emptyInventory")
+   cmdPrint(            "You have a key you found in the chair.",done)
+   label("emptyInventory")
+   cmdPrint(            "You are not carrying anything interesting.",done)
+
    # Open
+   synonym("open","unlock")
    label(action("open ?door"))
    label(action("open door with key"))
-   label(action("unlock ?door"))
-   label(action("unlock door with key"))
    cmdIfSetGoto("flagKey","unlockedDoor")
    cmdPrint(            "You try to open the door, but it is locked.",done)
    label("unlockedDoor")
    cmdPrint(            "You try the key in the door lock and it fits. You open the door and leave the room. I wonder what happens next...")
+   cmdPrint(            "")
+   cmdPrint(            "Thanks for playing")
    cmdInsert("END")
 
    # Quit
-   label(action("quit"))
+   synonym("quit","finish")
+   synonym("quit","end")
+   label(action("quit ?game"))
    cmdPrint(            "Goodbye.")
    cmdInsert("END")
 
@@ -262,7 +306,7 @@ def main():
    print("NEW")
    lineNum = 0;
    for line in asLines:
-      print("{:<5d} {}".format(lineNum,replaceVariables(line)))
+      print("{:<5d} {}".format(lineNumber(lineNum),replaceVariables(line)))
       lineNum+=1
 
 
@@ -272,6 +316,7 @@ asFlags = []
 asActions = []
 asLabel = {}
 actionTree = {}
+synonymList = {}
 
 # known labels
 prompt = "_prompt"
