@@ -5,16 +5,16 @@ def label(ls):
       if ls in asLabel:
          print("REM * Warning: label {} redefined".format(ls))
       asLabel[ls] = len(asLines)
-      print("REM {}={}".format(ls,asLabel[ls]))
+      print("REM label {}={}".format(ls,asLabel[ls]))
 
 def labelStr(ls):
    return "%{}%".format(ls)
 
 def checkFlag(flag):
    if flag not in asFlags:
-      asLabel[flag] = len(asFlags)-1
+      asLabel[flag] = len(asFlags)
       asFlags.append(flag)
-      print("REM {}={}".format(flag,asLabel[flag]))
+      #print("REM flag {}={}".format(flag,asLabel[flag]))
 
 def doCont(cont):
    if not cont:
@@ -52,12 +52,6 @@ def cmdSet(flag,cont=True):
    asLines.append('F({})=1'.format(labelStr(flag)))
    doCont(cont)
 
-def action(cmd):
-   wordList = cmd.split()
-   act = "." + "+".join(wordList)
-   asActions.append(act)
-   return act
-
 def replaceVariables(line):
    cont = True
    while(cont):
@@ -75,9 +69,60 @@ def replaceVariables(line):
             print("REM * Warning, variable {} undefined".format(var))
    return line
 
+def action(cmd):
+   wordList = cmd.split()
+   act = "." + "+".join(wordList)
+   asActions.append(act)
+
+   #print("REM action: {}".format(" ".join(wordList)))
+   # Put into tree structure
+
+   tree = actionTree
+
+   for w in range(len(wordList)):
+      word = wordList[w]
+      opt = 0
+      if (word[0] == '?'):
+         word = word[1:]
+         opt = 1
+      if word not in tree:
+         tree[word] = {}
+      if (w == len(wordList)-1):
+         tree[word]["!"] = act
+      if (opt):
+         tree["!"] = act
+      tree = tree[word]
+
+   return act
+
+def parseTree(tree,prefix,level=0):
+   label(prefix)
+
+   id=0
+   final = badParse
+   #breadth first
+   for key in tree.keys():
+      plabel = prefix + "." + str(id)
+      id = id +1
+      if (key == "*"):
+         final = tree[key]["!"]
+      elif (type(tree[key]) is dict):
+         cmdInsert('IF W$({}) = "{}" GOTO {}: REM tree {}'.format(level,key.upper(),labelStr(plabel),plabel))
+      else:
+         cmdInsert('IF C={} THEN GOTO {}: REM leaf {}'.format(level,labelStr(tree[key]),tree[key]))
+   cmdInsert('GOTO {}: REM default {}'.format(labelStr(final),final))
+
+   id=0
+   for key in tree.keys():
+      plabel = prefix + "." + str(id)
+      id = id +1
+      if (type(tree[key]) is dict):
+         if (key != "*"):
+            parseTree(tree[key],plabel,level+1)
+
+
 def main():
    done = False
-
 
    #----------------
    # Game Start
@@ -85,10 +130,22 @@ def main():
    cmdInsert('REM Written by Paul Wasson, August 2021')
    cmdInsert('? CHR$(4);"PR#3"')
    cmdInsert('DIM F({})'.format(labelStr(flagCount)))
-   cmdPrint(            "Welcome to ESCAPE ROOM, an entire text adventure for the Apple computer with only a single room. Try to escape!")
+   cmdPrint(            "Welcome to TOY ROOM, a tiny interactive fiction game to test out parsing text in AppleSoft")
    cmdPrint(            "")
    cmdInsert("GOTO {}".format(labelStr(start)))
 
+   #----------------
+   # Scanner
+   #----------------
+
+   label(scanner)
+   cmdInsert('V=0: FOR I=S TO LEN (A$): IF MID$(A$,I,1)=" " THEN NEXT')
+   cmdInsert('IF I > LEN (A$) THEN RETURN') 
+   cmdInsert('S=I: FOR I=S TO LEN(A$): IF MID$(A$,I,1)<>" " THEN  NEXT') 
+   cmdInsert('E=I-1: V=1:RETURN')
+
+   label(badParse)
+   cmdPrint(            "Sorry, I don't understand. Please try a different command.",done)
    #----------------
    # Commands
    #----------------
@@ -96,7 +153,7 @@ def main():
    # Help
    label(action("help"))
    label(action("hint"))
-   cmdPrint(            "Valid commands: {}".format(labelStr(helpString)),done)
+   cmdPrint(            "Try using 2 word commands in upper case, like SIT CHAIR",done)
 
    # Start
    label(action("new ?game"))
@@ -158,6 +215,9 @@ def main():
 
    # Open
    label(action("open ?door"))
+   label(action("open door with key"))
+   label(action("unlock ?door"))
+   label(action("unlock door with key"))
    cmdIfSetGoto("flagKey","unlockedDoor")
    cmdPrint(            "You try to open the door, but it is locked.",done)
    label("unlockedDoor")
@@ -174,23 +234,31 @@ def main():
    #----------------
 
    label(prompt)
-   cmdInsert('INVERSE : ?"Command?"; : NORMAL : INPUT " ";C')
-   cmdInsert('ON C GOTO {}'.format(labelStr(actionList)))
-   cmdPrint(            "Sorry, but I don't understand. Try a different command.")
-   cmdInsert('GOTO {}'.format(labelStr(prompt)))
+   cmdInsert('INVERSE: ?"Command?";: NORMAL: INPUT " ";A$: S=1: C=0')
+   cmdInsert('FOR C=0 TO 5: GOSUB {}: IF V THEN W$(C)=MID$(A$,S,E-S+1):S=E+1:NEXT'.format(labelStr(scanner)))
+
+   # Fall into parse
+
+   #----------------
+   # Parse
+   #----------------
+   # Fill in needed values
+   parseTree(actionTree,"parse")
 
    #----------------
    # Defines
    #----------------
    # Fill in needed values
 
-   asLabel[flagCount] = len(asFlags)-2
+   asLabel[flagCount] = len(asFlags)-1
 
    # Generate action list
    asLabel[actionList] = ",".join([str(asLabel[i]) for i in asActions])
    asLabel[helpString] = " ".join(["{}={}".format(i+1,asActions[i]) for i in range(len(asActions))])
 
+   #----------------
    # Dump program
+   #----------------
    print("NEW")
    lineNum = 0;
    for line in asLines:
@@ -199,10 +267,11 @@ def main():
 
 
 # Generate game
-asLines = [];
-asFlags = ['flagDummy']  # applesoft arrays start with 1
-asActions = [];
-asLabel = {};
+asLines = []
+asFlags = []
+asActions = []
+asLabel = {}
+actionTree = {}
 
 # known labels
 prompt = "_prompt"
@@ -211,5 +280,7 @@ start = "_start"
 actionList = "_actionlist"
 helpString = "_help"
 flagCount = "_flagCount"
+scanner = "_scanner"
+badParse = "_badparse"
 
 main()
