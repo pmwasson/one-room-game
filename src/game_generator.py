@@ -23,10 +23,6 @@ def doCont(cont):
    if not cont:
       asLines.append('GOTO {}'.format(labelStr(prompt)))
 
-def getUnique():
-   asUnique = asUnique + 1
-   return asUnique
-
 def cmdInsert(line,cont=True):
    asLines.append(line)
    doCont(cont)
@@ -170,8 +166,8 @@ def main():
    # Commands
    #----------------
 
-   # Help
    synonym("help","hint")
+   # Help
    label(action("help"))
    cmdPrint(            "Try using 2 word commands in upper case, like LOOK ROOM or SIT CHAIR. You can try longer commands like OPEN DOOR WITH KEY, but it is not generally needed.")
    cmdPrint(            "Here are some word you can try: LOOK, SIT, STAND, GET, DROP, INVENTORY, OPEN, QUIT.",done)
@@ -333,7 +329,6 @@ synonymList = {}
 
 # known labels
 prompt = "_prompt"
-wait = "_wait"
 start = "_start"
 actionList = "_actionlist"
 helpString = "_help"
