@@ -1,7 +1,7 @@
 import textwrap
 
 def lineNumber(val):
-   return (val+1)*10
+   return (val+1)
 
 def label(ls):
    if (ls != ''):
@@ -137,6 +137,7 @@ def synonym(base,word):
    synonymList[base].append(word)
 
 def main():
+   maxWords = 4
    done = False
 
    #----------------
@@ -148,7 +149,7 @@ def main():
    cmdInsert('REM  Written by Paul Wasson, August 2021')
    cmdInsert('REM -------------------------------------')
    cmdInsert('? CHR$(4);"PR#3"')
-   cmdInsert('DIM F({})'.format(labelStr(flagCount)))
+   cmdInsert('DIM W$({}): DIM F({})'.format(maxWords,labelStr(flagCount)))
    cmdPrint(            "Welcome to TOY ROOM, a tiny interactive fiction game to test out parsing text in AppleSoft.")
    cmdPrint(            "")
    cmdInsert("GOTO {}".format(labelStr(start)))
@@ -176,8 +177,9 @@ def main():
    cmdPrint(            "Here are some word you can try: LOOK, SIT, STAND, GET, DROP, INVENTORY, OPEN, QUIT.",done)
 
    # Start
+   synonym("new","reset")
    label(action("new ?game"))
-   label(action("start over"))
+   label(action("start ?over"))
    cmdPrint(            "Starting the game over from the beginning...")
    cmdPrint(            "")
    cmdInsert("FOR I = 0 to {} : F(I)=0 : NEXT".format(labelStr(flagCount)))
@@ -213,6 +215,8 @@ def main():
 
    # Sit
    label(action("sit ?chair"))
+   label(action("sit on chair"))
+   label(action("sit in chair"))
    cmdPrint(            "You sit on the chair but it is so uncomfortable that you decide to stand up again.")
    cmdSet("flagSit")
    cmdIfSetGoto("flagKey",prompt)
@@ -232,6 +236,12 @@ def main():
    cmdSet("flagKey")
    cmdPrint(            "You pick up the key.",done)
 
+   label(action("get chair"))
+   cmdPrint(            "The chair is too bulky to carry around.",done)
+
+   label(action("get door"))
+   cmdPrint(            "The door is affixed to the wall.",done)
+
    label(action("get *"))
    label("noGet")
    cmdPrint(            "You can't get that!",done)
@@ -241,10 +251,12 @@ def main():
 
    # Drop
    label(action("drop key"))
+   cmdIfClrGoto("flagKey","noDrop")
    cmdClr("flagKey")
    cmdPrint(            "You drop the key and if falls back into the seat",done)
 
    label(action("drop *"))
+   label("noDrop")
    cmdPrint(            "You can't drop that!",done)
 
    # Inventory
@@ -278,8 +290,9 @@ def main():
    #----------------
 
    label(prompt)
-   cmdInsert('INVERSE: ?"Command?";: NORMAL: INPUT " ";A$: S=1: C=0')
-   cmdInsert('FOR C=0 TO 5: GOSUB {}: IF V THEN W$(C)=MID$(A$,S,E-S+1):S=E+1:NEXT'.format(labelStr(scanner)))
+   cmdInsert('FOR C=0 TO {}: W$(C)="": NEXT: I=FRE(0)'.format(maxWords,labelStr(scanner)))
+   cmdInsert('INVERSE: ?"Command?";: NORMAL: INPUT " ";A$: S=1')
+   cmdInsert('FOR C=0 TO {}: GOSUB {}: IF V THEN W$(C)=MID$(A$,S,E-S+1):S=E+1:NEXT'.format(maxWords,labelStr(scanner)))
 
    # Fall into parse
 
@@ -329,3 +342,4 @@ scanner = "_scanner"
 badParse = "_badparse"
 
 main()
+
