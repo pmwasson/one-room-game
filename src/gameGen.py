@@ -54,13 +54,15 @@ class GameGen:
       self.asLines.append(line)
       self.doCont(cont)
 
-   def cmdPrint(self,line="",cont=True):
+   def wrapPrint(self,line):
       if (line==""):
-         self.asLines.append('?')
+         return('?')
       else:
          wrapper = textwrap.TextWrapper(width=self.screenWidth-1)
-         for line in wrapper.wrap(text=line):
-            self.asLines.append('? "{}"'.format(line))
+         return ":".join(['? "{}"'.format(line) for line in wrapper.wrap(text=line)])
+
+   def cmdPrint(self,line="",cont=True):
+      self.asLines.append(self.wrapPrint(line))
       self.doCont(cont)  
 
    def cmdRem(self,lines):
@@ -83,13 +85,22 @@ class GameGen:
    def cmdIfClrGoto(self,flag,next=prompt,cont=True):
       self.cmdIfValGoto(flag,0,next,cont)
 
-   def cmdSet(self,flag,val=1,cont=True):
+   def cmdSetVal(self,flag,val=1,cont=True):
       self.checkFlag(flag)
       self.asLines.append('F({})={}'.format(self.labelStr(flag),val))
       self.doCont(cont)
 
+   def cmdSet(self,flag,cont=True):
+      self.cmdSetVal(flag,1,cont)
+
    def cmdClr(self,flag,cont=True):
-      self.cmdSet(flag,0,cont)
+      self.cmdSetVal(flag,0,cont)
+
+   def cmdAltPrint(self,flag,trueLine,falseLine,cont=True):
+      self.checkFlag(flag)
+      self.asLines.append('IF F({}) THEN {}'.format(self.labelStr(flag),self.wrapPrint(trueLine)))
+      self.asLines.append('IF F({})=0 THEN {}'.format(self.labelStr(flag),self.wrapPrint(falseLine)))
+      self.doCont(cont)
 
    def replaceVariables(self,line):
       cont = True

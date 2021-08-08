@@ -15,7 +15,7 @@ def main():
       ])
 
    # Start of game
-   game.cmdPrint("Welcome to TOY ROOM, a tiny interactive fiction game to test out parsing text in AppleSoft.")
+   game.cmdPrint("Welcome to a tiny interactive fiction game to test out parsing text in AppleSoft.")
    game.cmdPrint()
    game.cmdPrint("Your standing in a small room with a closed door.",done)
 
