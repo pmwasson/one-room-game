@@ -40,6 +40,9 @@ class GameGen:
    def labelStr(self,ls):
       return "%{}%".format(ls)
 
+   def gotoStr(self,next):
+      return 'GOTO {}'.format(self.labelStr(next))
+
    def checkFlag(self,flag):
       if flag not in self.asFlags:
          self.asLabel[flag] = len(self.asFlags)
@@ -70,7 +73,7 @@ class GameGen:
          self.asLines.append('REM * {}'.format(line))
 
    def cmdGoto(self,next=prompt):
-      self.asLines.append('GOTO {}'.format(self.labelStr(next)))
+      self.asLines.append(self.gotoStr(next))
 
    def cmdGosub(self,next):
       self.asLines.append('GOSUB {}'.format(self.labelStr(next)))
@@ -123,8 +126,10 @@ class GameGen:
 
    def cmdIfPrint(self,flag,value,line,cont=True):
       self.checkFlag(flag)
-      self.asLines.append('IF F({})={} THEN {}'.format(self.labelStr(flag),value,self.wrapPrint(line)))
-      self.doCont(cont)
+      result = 'IF F({})={} THEN {}'.format(self.labelStr(flag),value,self.wrapPrint(line))
+      if not cont:
+         result += ":" + self.gotoStr(self.prompt)
+      self.asLines.append(result)
 
    def replaceVariables(self,line):
       cont = True

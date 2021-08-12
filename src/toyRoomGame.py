@@ -83,22 +83,22 @@ def main():
    game.cmdPrint("You make the bed like Mom taught you.")
    game.cmdSet("flagBed",done)
 
-   # Make
+   # Fold
    game.label(game.action("fold ?clothes"))
    game.cmdGosub("autoStand")
    game.cmdPrint("It takes a bit of time, but you fold up all the laundry.")
-   game.cmdSet("flagBed",done)
+   game.cmdSet("flagClothesState",done)
 
    # Put
-   game.label(game.action("put"))
+   game.label(game.action("put *"))
    game.label(game.action("put away *"))
-   game.cmdPrint("(Try 'PUT ____ IN ____).")
+   game.cmdPrint("(Try 'PUT ____ IN ____).",done)
    game.label(game.action("put clothes in closet"))
-
-   game.cmdGosub("autoStand")
-   game.cmdPrint("It takes a bit of time, but you fold up all the laundry.")
-   game.cmdSet("flagBed",done)
-
+   game.cmdIfPrint("flagClothes",0,"You aren't carrying any clothes.",done)
+   game.cmdIfPrint("flagClothesState",0,"You can't put unfolded clothes in the closet.",done)
+   game.cmdSet("flagClothesGone")
+   game.cmdClr("flagCloses")
+   game.cmdPrint("You arrange the clothes in the closet.",done)
 
    # Sit
    game.label(game.action("sit ?chair"))
@@ -155,7 +155,8 @@ def main():
    game.cmdPrint("What do you want to drop?",done)
 
    game.label(game.action("drop clothes"))
-   game.cmdAltPrint("flagClothes","You drop the dirty clothes on the floor.","You are not holding any dirty clothes.")
+   game.cmdAltPrint("flagClothes","You drop the clothes in a disorganized pile on the floor.","You are not holding any dirty clothes.")
+   game.cmdClr("flagClothesState")
    game.cmdClr("flagClothes",done)
 
    game.label(game.action("drop *"))
