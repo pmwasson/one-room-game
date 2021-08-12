@@ -19,7 +19,7 @@ class GameGen:
    def __init__(self, comment, maxWords=4):
       self.maxWords = maxWords
       self.asLines = []
-      self.asFlags = []
+      self.asFlags = [] 
       self.asActions = []
       self.asLabel = {}
       self.actionTree = {}
@@ -72,6 +72,12 @@ class GameGen:
    def cmdGoto(self,next=prompt):
       self.asLines.append('GOTO {}'.format(self.labelStr(next)))
 
+   def cmdGosub(self,next):
+      self.asLines.append('GOSUB {}'.format(self.labelStr(next)))
+
+   def cmdReturn(self):
+      self.asLines.append('RETURN')
+
    def cmdIfSetGoto(self,flag,next=prompt,cont=True):
       self.checkFlag(flag)
       self.asLines.append('IF F({}) GOTO {}'.format(self.labelStr(flag),self.labelStr(next)))
@@ -96,10 +102,28 @@ class GameGen:
    def cmdClr(self,flag,cont=True):
       self.cmdSetVal(flag,0,cont)
 
+   def cmdExp(self,flag1,flag2,exp,flag3,cont=True):
+      self.checkFlag(flag1)
+      self.checkFlag(flag2)
+      self.checkFlag(flag3)
+      self.asLines.append('F({})=F({}) {} F({})'.format(self.labelStr(flag1),self.labelStr(flag2),exp,self.labelStr(flag3)))
+      self.doCont(cont)
+
+   def cmdAnd(self,flag1,flag2,flag3,cont=True):
+      self.cmdExp(flag1,flag2,"AND",flag3,cont)
+
+   def cmdOr(self,flag1,flag2,flag3,cont=True):
+      self.cmdExp(flag1,flag2,"OR",flag3,cont)
+
    def cmdAltPrint(self,flag,trueLine,falseLine,cont=True):
       self.checkFlag(flag)
       self.asLines.append('IF F({}) THEN {}'.format(self.labelStr(flag),self.wrapPrint(trueLine)))
       self.asLines.append('IF F({})=0 THEN {}'.format(self.labelStr(flag),self.wrapPrint(falseLine)))
+      self.doCont(cont)
+
+   def cmdIfPrint(self,flag,value,line,cont=True):
+      self.checkFlag(flag)
+      self.asLines.append('IF F({})={} THEN {}'.format(self.labelStr(flag),value,self.wrapPrint(line)))
       self.doCont(cont)
 
    def replaceVariables(self,line):
@@ -214,10 +238,10 @@ class GameGen:
 
       # Default message
       self.label(self.badParse)
-      self.cmdPrint("Sorry, I don't understand. Please try a different command.",False)
+      self.cmdPrint("Sorry, I don't understand. Please try a different command or type HELP.",False)
 
       # Start of game
       self.label(self.start)
 
       # Reset state
-      self.cmdInsert("FOR I=0 to {}: F(I)=0: NEXT".format(self.labelStr(self.flagCount)))
+      self.cmdInsert("HOME: FOR I=0 to {}: F(I)=0: NEXT".format(self.labelStr(self.flagCount)))
