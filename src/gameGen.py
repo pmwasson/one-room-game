@@ -10,8 +10,8 @@ class GameGen:
    # known labels
    prompt = "_prompt"
    start = "_start"
-   actionList = "_actionlist"
    flagCount = "_flagCount"
+   flagList = "_flagList"
    scanner = "_scanner"
    parser = "_parser"
    badParse = "_badparse"
@@ -207,6 +207,7 @@ class GameGen:
    def generate(self):
       # Set final values
       self.asLabel[self.flagCount] = max(0,len(self.asFlags)-1)
+      self.asLabel[self.flagList] = ', '.join(self.asFlags)
 
       # Generate parser
       self.label(self.parser)
@@ -224,6 +225,7 @@ class GameGen:
       # Top of program
       self.cmdInsert('TEXT:NORMAL:? CHR$(4);"PR#3"')
       self.cmdInsert('DIM W$({}): DIM F({})'.format(self.maxWords,self.labelStr(self.flagCount)))
+      self.cmdRem(['Flags',self.labelStr(self.flagList)])
       self.cmdGoto(self.start)
 
       # Scanner

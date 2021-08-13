@@ -15,13 +15,13 @@ def main():
       ])
 
    # Start of game
-   game.cmdPrint("'Mom, its not fair! She was being mean to me, so why do I have to stay in my room and she can go play with her friends?', you ask.")
+   game.cmdPrint("'Mom, it's not fair! She was being mean to me, so why do I have to stay in my room and she can go play with her friends?', you ask.")
    game.cmdPrint()
    game.cmdPrint("Mom says, 'Just think about what you said. There are plenty of things to keep you busy in there while you cool down.'")
    game.cmdPrint()
    game.cmdPrint("[ToyRoom by Paul Wasson, August 2021. Developed with an interactive fiction engine written in Python that generates an AppleSoft basic game.]")
    game.cmdPrint()
-   game.cmdPrint("You are in your bedroom. Its messy and you want to leave.",done)
+   game.cmdPrint("You are in your bedroom. It's messy and you want to leave.",done)
 
    # Restart
    game.synonym("new","reset")
@@ -41,7 +41,8 @@ def main():
    game.label(game.action("look ?room"))
    game.cmdPrint("You look around your bedroom. You see a desk with some homework on it and a chair.")
    game.cmdAltPrint("flagBed","There is a bed that is neatly made.","There is a bed that is unmade with the blanket half off of it.")
-   game.cmdIfPrint("flagClothes",0,"A pile of clothes cover part of the floor.")
+   game.cmdOr("flagTemp","flagClothes","flagClothesCloset")
+   game.cmdIfPrint("flagTemp",0,"A pile of clothes cover part of the floor.")
    game.cmdIfPrint("flagToys",0,"A lot of toys are piled up in the corner of the room.")
    game.cmdPrint("There is also a toybox and a closet. There is one door but your not sure if you shouldn't leave yet.",done)
    game.cmdIfPrint("flagSit",1,"You are sitting in the chair.")
@@ -49,7 +50,7 @@ def main():
 
    game.label(game.action("look clothes"))
    game.synonym("clothes","laundry")
-   game.cmdIfPrint("flagClothesGone",1,"The clothes are all neatly put away in the closet.",done)
+   game.cmdIfPrint("flagClothesCloset",1,"The clothes are all neatly put away in the closet.",done)
    game.cmdAltPrint("flagClothesState","The clothes are all stacked and neatly folded.",
                                        "It is a random pile of clothes. At least they don't smell too bad.",done)
 
@@ -71,12 +72,12 @@ def main():
    game.cmdPrint("It is a small desk chair.",done)
 
    game.label(game.action("look closet"))
-   game.cmdAltPrint("flagClothesGone","The closet is full of neatly stacked and hung up clothes.",
+   game.cmdAltPrint("flagClothesCloset","The closet is full of neatly stacked and hung up clothes.",
       "The closet looks sort of empty, like there should be more clothes in there.",done)
 
    game.label(game.action("look desk"))
-   game.cmdPrint("Its a small desk with your homework on top.")
-   game.cmdAltPrint("flagScrapbook","Its seems a little wobbly.","There is something shoved under the desk to keep it from wobbling.",done)
+   game.cmdPrint("It's a small desk with your homework on top.")
+   game.cmdAltPrint("flagScrapbook","It seems a little wobbly.","There is something shoved under the desk to keep it from wobbling.",done)
 
    game.label(game.action("look under desk"))
    game.cmdSet("flagDesk")
@@ -85,10 +86,14 @@ def main():
    game.label(game.action("look under *"))
    game.cmdPrint("There is nothing interesting under that.",done)
 
+   game.label(game.action("look homework"))
+   game.cmdAltPrint("flagHomework","Your homework is all done. It was some of your best work and you think you will get a good grade.",
+      "It's the homework that is due tomorrow that you told your mom you would do right away, but didn't.",done)
+
    game.label(game.action("look scrapbook"))
    game.label(game.action("read scrapbook"))
    game.cmdAltPrint("flagScrapbook","This is a scrapbook with 3 pages that you were going to finish for your sister, but never started it.",
-      "You can't examine the scrapbook when its holding up the desk.",done)
+      "You can't examine the scrapbook when it's holding up the desk.",done)
 
    game.label(game.action("look page"))
    game.label(game.action("look at page"))
@@ -137,6 +142,16 @@ def main():
    game.cmdPrint("You make the bed like Mom taught you.")
    game.cmdSet("flagBed",done)
 
+   # Do
+   game.label(game.action("do homework"))
+   game.cmdIfPrint("flagSit",0,"You can't do your homework standing up.",done)
+   game.cmdAltPrint("flagHomework","It took a while, but it's already done.","You start working on the homework and get into a groove. It takes a while, but you get it all done.")
+   game.cmdSet("flagHomework",done)
+
+   game.label(game.action("do"))
+   game.label(game.action("do *"))
+   game.cmdPrint("Do what?",done)
+
    # Fold
    game.label(game.action("fold ?clothes"))
    game.cmdGosub("autoStand")
@@ -157,8 +172,8 @@ def main():
    game.label(game.action("put clothes in closet"))
    game.cmdIfPrint("flagClothes",0,"You aren't carrying any clothes.",done)
    game.cmdIfPrint("flagClothesState",0,"You can't put unfolded clothes in the closet.",done)
-   game.cmdSet("flagClothesGone")
-   game.cmdClr("flagCloses")
+   game.cmdSet("flagClothesCloset")
+   game.cmdClr("flagClothes")
    game.cmdPrint("You arrange the clothes in the closet.",done)
 
    # Sit
@@ -203,12 +218,15 @@ def main():
    game.cmdPrint("The desk is too heavy to move.",done)
 
    game.label(game.action("get chair"))
-   game.cmdPrint("You move the chair around a bit, but decided its fine where it is.",done)
+   game.cmdPrint("You move the chair around a bit, but decided it's fine where it is.",done)
 
    game.label(game.action("get clothes"))
-   game.cmdIfPrint("flagClothesGone",1,"The clothes are all put away, so you decide to just leave them alone.",done)
+   game.cmdIfPrint("flagClothesCloset",1,"The clothes are all put away, so you decide to just leave them alone.",done)
    game.cmdAltPrint("flagClothes","You are already holding the clothes.","You pick the clothes off the floor.")
    game.cmdSet("flagClothes",done)
+
+   game.label(game.action("get homework"))
+   game.cmdPrint("It's too many books and papers to hold all at once. You decide to just leave it on the desk.",done)
 
    game.label(game.action("get scrapbook"))
    game.cmdIfPrint("flagDesk",0,"What scrapbook?",done)
@@ -238,8 +256,9 @@ def main():
    # Inventory
    game.label(game.action("inventory"))
    game.cmdClr("flagTemp")
-   game.cmdOr("flagTemp","flagClothes","flagClothes")
+   game.cmdOr("flagTemp","flagClothes","flagScrapbook")
    game.cmdIfPrint("flagClothes",1,"You are holding some clothes.")
+   game.cmdIfPrint("flagScrapbook",1,"You have the scrapbook that was under your desk.")
    game.cmdIfPrint("flagTemp",0,"You are not holding anything interesting.")
    game.cmdGoto()
 
