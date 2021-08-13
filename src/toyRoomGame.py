@@ -43,7 +43,8 @@ def main():
    game.cmdAltPrint("flagBed","There is a bed that is neatly made.","There is a bed that is unmade with the blanket half off of it.")
    game.cmdOr("flagTemp","flagClothes","flagClothesCloset")
    game.cmdIfPrint("flagTemp",0,"A pile of clothes cover part of the floor.")
-   game.cmdIfPrint("flagToys",0,"A lot of toys are piled up in the corner of the room.")
+   game.cmdOr("flagTemp","flagToys","flagToybox")
+   game.cmdIfPrint("flagTemp",0,"A lot of toys are piled up in the corner of the room.")
    game.cmdPrint("There is also a toybox and a closet. There is one door but your not sure if you shouldn't leave yet.",done)
    game.cmdIfPrint("flagSit",1,"You are sitting in the chair.")
    game.cmdIfPrint("flagSleep",1,"You are lying in bed.")
@@ -74,6 +75,10 @@ def main():
    game.label(game.action("look closet"))
    game.cmdAltPrint("flagClothesCloset","The closet is full of neatly stacked and hung up clothes.",
       "The closet looks sort of empty, like there should be more clothes in there.",done)
+
+   game.label(game.action("look toybox"))
+   game.cmdAltPrint("flagToybox","The toybox is almost overflowing it has so many toys in it.",
+      "The toybox is mostly empty.",done)
 
    game.label(game.action("look desk"))
    game.cmdPrint("It's a small desk with your homework on top.")
@@ -126,7 +131,9 @@ def main():
    game.cmdIfPrint("flagScrapbook",0,"Get the scrapbook first.",done)
    game.cmdPrint("Page 3 says to paste a picture you and your sister together.",done)
 
-
+   game.synonym("toys","toy")
+   game.label(game.action("look toys"))
+   game.cmdPrint("There are many toys of superheroes in various poses and some cars.",done)
 
    game.synonym("me","self")
    game.label(game.action("look me"))
@@ -176,6 +183,18 @@ def main():
    game.cmdClr("flagClothes")
    game.cmdPrint("You arrange the clothes in the closet.",done)
 
+   game.label(game.action("put clothes in *"))
+   game.cmdPrint("Clothes don't go in there.",done)
+
+   game.label(game.action("put toys in toybox"))
+   game.cmdIfPrint("flagToys",0,"You aren't holding any toys.",done)
+   game.cmdSet("flagToybox")
+   game.cmdClr("flagToys")
+   game.cmdPrint("You put all the toys in the toybox.",done)
+
+   game.label(game.action("put toys in *"))
+   game.cmdPrint("Toys don't go in there.",done)
+
    # Sit
    game.label(game.action("sit ?chair"))
    game.label(game.action("sit on chair"))
@@ -207,6 +226,17 @@ def main():
    game.cmdClr("flagBed")
    game.cmdSet("flagSleep",done)
 
+   # Play
+   game.label(game.action("play"))
+   game.label(game.action("play toys"))
+   game.label(game.action("play with toys"))
+   game.cmdClr("flagToys")
+   game.cmdClr("flagToybox")
+   game.cmdPrint("You arrange the toys in the corner of the room and play with them for a while. Pow! Zaroooom!",done)
+
+   game.label(game.action("play *"))
+   game.cmdPrint("Play with what?",done)
+
    # Get
    game.label(game.action("get"))
    game.cmdPrint("Want do you want to get?",done)
@@ -225,6 +255,11 @@ def main():
    game.cmdAltPrint("flagClothes","You are already holding the clothes.","You pick the clothes off the floor.")
    game.cmdSet("flagClothes",done)
 
+   game.label(game.action("get toys"))
+   game.cmdAltPrint("flagToys","You already are holding the toys.","You grab the toys.")
+   game.cmdClr("flagToybox")
+   game.cmdSet("flagToys",done)
+
    game.label(game.action("get homework"))
    game.cmdPrint("It's too many books and papers to hold all at once. You decide to just leave it on the desk.",done)
 
@@ -241,7 +276,7 @@ def main():
    game.cmdPrint("What do you want to drop?",done)
 
    game.label(game.action("drop clothes"))
-   game.cmdAltPrint("flagClothes","You drop the clothes in a disorganized pile on the floor.","You are not holding any dirty clothes.")
+   game.cmdAltPrint("flagClothes","You drop the clothes in a disorganized pile on the floor.","You are not holding any clothes.")
    game.cmdClr("flagClothesState")
    game.cmdClr("flagClothes",done)
 
@@ -250,15 +285,20 @@ def main():
    game.cmdAltPrint("flagScrapbook","You shove the scrapbook back under the desk so it won't wobble.","You don't have the scrapbook.")
    game.cmdClr("flagScrapbook",done)
 
+   game.label(game.action("drop toys"))
+   game.cmdAltPrint("flagToys","You drop the toys in the corner of the room.","You are not holding the toys.")
+   game.cmdClr("flagToys",done)
+
    game.label(game.action("drop *"))
    game.cmdPrint("You can't drop that!",done)
 
    # Inventory
    game.label(game.action("inventory"))
-   game.cmdClr("flagTemp")
    game.cmdOr("flagTemp","flagClothes","flagScrapbook")
+   game.cmdOr("flagTemp","flagTemp","flagToys")
    game.cmdIfPrint("flagClothes",1,"You are holding some clothes.")
    game.cmdIfPrint("flagScrapbook",1,"You have the scrapbook that was under your desk.")
+   game.cmdIfPrint("flagToys",1,"You are holding the toys that were on the floor.")
    game.cmdIfPrint("flagTemp",0,"You are not holding anything interesting.")
    game.cmdGoto()
 
@@ -267,7 +307,21 @@ def main():
    game.label(game.action("exit ?room"))
    game.synonym("exit","leave")
    game.cmdGosub("autoStand")
-   game.cmdPrint("You crack open the door and peek out into the hallway. Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
+   game.cmdPrint("You crack open the door and peek out into the hallway.")
+   game.cmdAnd("flagTemp","flagBed","flagHomework")
+   game.cmdAnd("flagTemp","flagTemp","flagClothesCloset")
+   game.cmdAnd("flagTemp","flagTemp","flagToybox")
+   game.cmdIfSetGoto("flagTemp","gameWin1")
+   game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
+
+   game.label("gameWin1")
+   game.cmdPrint("Mom looks around the room and starts to smile. 'Bed made, homework done, everything put away! Come here and give me a hug.'")
+   game.cmdPrint("You walk out of the room feeling proud.")
+   game.cmdPrint()
+   game.cmdPrint("[You got the good-boy ending! But there is another way to win the game.]")
+   game.cmdPrint()
+   game.cmdPrint("Thanks for playing!  Goodbye.")
+   game.cmdInsert("END")
 
    # Quit
    game.synonym("quit","finish")
