@@ -10,7 +10,7 @@ def main():
       "Written by Paul Wasson, August 2021",
       "",
       "Generated from a python script. For more information, see:",
-      "http://https://github.com/pmwasson/one-room-game",
+      "https://github.com/pmwasson/one-room-game",
       ""
       ])
 

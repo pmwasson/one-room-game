@@ -213,7 +213,6 @@ class GameGen:
       self.parseTree(self.actionTree,"parse")
 
       # Dump program
-      print("NEW")
       lineNum = 0;
       fmt = "{:<"+str(self.lineNumberWidth)+"} {}"
       for line in self.asLines:
