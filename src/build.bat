@@ -1,14 +1,14 @@
 ::---------------------------------------------------------------------------
 :: Generate basic
 ::---------------------------------------------------------------------------
-cd ..\build
-python3 ..\src\toyRoomGame.py > toyroom.txt
-python3 ..\src\testGame.py > test.txt
-
+python3 toyRoomGame.py > ..\build\toyroom.txt
+python3 testGame.py > ..\build\test.txt
 
 ::---------------------------------------------------------------------------
 :: Build disk 
 ::---------------------------------------------------------------------------
+
+cd ..\build
 
 :: Start with a blank prodos disk
 copy ..\disk\blank.dsk toyroom.dsk

@@ -40,6 +40,7 @@ def main():
    game.synonym("look","examine")
    game.label(game.action("look ?room"))
    game.cmdPrint("You look around your bedroom. You see a desk with some homework on it and a chair.")
+   game.cmdAltPrint("flagWindow","There is a open window which lets in a slight breeze","There is a closed window on the wall opposite of the door.")
    game.cmdAltPrint("flagBed","There is a bed that is neatly made.","There is a bed that is unmade with the blanket half off of it.")
    game.cmdOr("flagTemp","flagClothes","flagClothesCloset")
    game.cmdIfPrint("flagTemp",0,"A pile of clothes cover part of the floor.")
@@ -62,8 +63,11 @@ def main():
       "You know how to make your bed, you just don't like to.",done)
    game.label(game.action("look under bed"))
    game.cmdPrint("You look under the bed and a Grue eats you. Game over!")
-   game.cmdInsert('INPUT "Press RETURN to restart game> ";A$')
-   game.cmdGoto(game.start)
+   game.cmdPrint()
+   game.cmdPrint("[You got the Zork ending! But there are other ways to finish the game.]")
+   game.cmdPrint()
+   game.cmdPrint("Thanks for playing!  Goodbye.")
+   game.cmdInsert("END")
 
    game.label(game.action("look door"))
    game.cmdPrint("Mom probably doesn't want you to leave yet.",done)
@@ -134,6 +138,11 @@ def main():
    game.synonym("toys","toy")
    game.label(game.action("look toys"))
    game.cmdPrint("There are many toys of superheroes in various poses and some cars.",done)
+
+   game.label(game.action("look window"))
+   game.label(game.action("look out window"))
+   game.cmdAltPrint("flagScrapbook","You lean out of the open window and see the ground below you.",
+      "You look out the closed window and see your backyard.",done)
 
    game.synonym("me","self")
    game.label(game.action("look me"))
@@ -268,6 +277,9 @@ def main():
    game.cmdAltPrint("flagScrapbook","You got the scrapbook in your hand.","You pull the scrapbook out from under the desk.")
    game.cmdSet("flagScrapbook",done)
 
+   game.label(game.action("get window"))
+   game.cmdPrint("You can't get a window, but you might be able to open or close it.",done)
+
    game.label(game.action("get *"))
    game.cmdPrint("You can't get that!",done)
 
@@ -302,6 +314,12 @@ def main():
    game.cmdIfPrint("flagTemp",0,"You are not holding anything interesting.")
    game.cmdGoto()
 
+   # Close
+   game.label(game.action("close window"))
+   game.cmdAltPrint("flagWindow","You slam the window shut.",
+                                 "The window is already closed.")
+   game.cmdClr("flagWindow",done)
+
    # Open
    game.label(game.action("open door"))
    game.label(game.action("exit ?room"))
@@ -314,11 +332,29 @@ def main():
    game.cmdIfSetGoto("flagTemp","gameWin1")
    game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
 
+   game.label(game.action("open window"))
+   game.cmdAltPrint("flagWindow","The window is already openned.",
+                                 "It sticks a little, but you are able to open the window.")
+   game.cmdSet("flagWindow",done)
+
+   # Good-boy ending
    game.label("gameWin1")
    game.cmdPrint("Mom looks around the room and starts to smile. 'Bed made, homework done, everything put away! Come here and give me a hug.'")
    game.cmdPrint("You walk out of the room feeling proud.")
    game.cmdPrint()
-   game.cmdPrint("[You got the good-boy ending! But there is another way to win the game.]")
+   game.cmdPrint("[You got the good-boy ending! But there are other ways to finish the game.]")
+   game.cmdPrint()
+   game.cmdPrint("Thanks for playing!  Goodbye.")
+   game.cmdInsert("END")
+
+   # Hobo ending
+   game.label(game.action("exit window"))
+   game.label(game.action("climb window"))
+   game.label(game.action("climb out window"))
+   game.cmdIfPrint("flagWindow",0,"You can't exit through a closed window.",done)
+   game.cmdPrint("You climb out the window and jump down to the grass below. You climb over the back fence and head out. Glancing back once over your shoulder you vow to never return to a home that treaty you so unfairly.")
+   game.cmdPrint()
+   game.cmdPrint("[You got the hobo ending! But there are other ways to finish the game.]")
    game.cmdPrint()
    game.cmdPrint("Thanks for playing!  Goodbye.")
    game.cmdInsert("END")
