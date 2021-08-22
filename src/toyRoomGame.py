@@ -77,6 +77,7 @@ def main():
    game.cmdPrint("It is a small desk chair.",done)
 
    game.label(game.action("look closet"))
+   game.label(game.action("look in closet"))
    game.cmdAltPrint("flagClothesCloset","The closet is full of neatly stacked and hung up clothes.",
       "The closet looks sort of empty, like there should be more clothes in there.",done)
 
@@ -117,7 +118,15 @@ def main():
    game.label(game.action("read page 1"))
    game.label(game.action("read scrapbook page 1"))
    game.cmdIfPrint("flagScrapbook",0,"It is hard to read a book that you are not holding.",done)
-   game.cmdPrint("Page 1 says to draw a picture of your sister.",done)
+   game.cmdAltPrint("flagPage1","Page 1 has a pciture you drew of you and your sister.","Page 1 says to draw a picture of your sister.",done)
+
+   game.label(game.action("draw ?picture"))
+   game.label(game.action("draw sister"))
+   game.label(game.action("draw picture of sister"))
+   game.cmdIfPrint("flagScrapbook",0,"You think about drawing a picture of your sister, but can't find any paper.",done)
+   game.cmdIfPrint("flagPage1",1,"You want to redo to picture of your sister so you paste a blank page over the previous drawing.")
+   game.cmdPrint("You draw a nice picture of you and your sister on page 1 of the scrapbook.")
+   game.cmdSet("flagPage1",done)
 
    game.synonym("2","two")
    game.label(game.action("look page 2"))
@@ -125,7 +134,14 @@ def main():
    game.label(game.action("read page 2"))
    game.label(game.action("read scrapbook page 2"))
    game.cmdIfPrint("flagScrapbook",0,"Page 2 of what? Maybe you should be holding a book.",done)
-   game.cmdPrint("Page 2 wants you to write a poem of how your sister make you feel.",done)
+   game.cmdAltPrint("flagPage2","Page 2 has a poem you wrote about your sister. It seems a little corny, but maybe she will like it.",
+      "Page 2 wants you to write a poem of how your sister make you feel.",done)
+
+   game.label(game.action("write ?poem"))
+   game.cmdIfPrint("flagScrapbook",0,"You feel like writing something, but don't have any paper.",done)
+   game.cmdIfPrint("flagPage2",1,"You come up with a new idea and erase the previous poem.")
+   game.cmdPrint("You don't feel like a good writer, but you make up a nice poem for your sister on page 2 of the scrapbook.")
+   game.cmdSet("flagPage2",done)
 
    game.synonym("3","three")
    game.label(game.action("look page 3"))
@@ -133,7 +149,14 @@ def main():
    game.label(game.action("read page 3"))
    game.label(game.action("read scrapbook page 3"))
    game.cmdIfPrint("flagScrapbook",0,"Get the scrapbook first.",done)
-   game.cmdPrint("Page 3 says to paste a picture you and your sister together.",done)
+   game.cmdAltPrint("flagPage2","Page 3 has the picture you found of you and your sister laughing.",
+      "Page 3 says to paste a picture you and your sister together.",done)
+
+   game.label(game.action("paste ?picture"))
+   game.cmdIfPrint("flagScrapbook",0,"Not sure where you would paste a picture.",done)
+   game.cmdIfPrint("flagPage3",1,"You decide you don't like the picture you found and take it out.")
+   game.cmdPrint("You dig through your desk drawer and find a good picture of you and your sister. You paste it onto page 3 of the scrapbook.")
+   game.cmdSet("flagPage3",done)
 
    game.synonym("toys","toy")
    game.label(game.action("look toys"))
@@ -330,6 +353,12 @@ def main():
    game.cmdAnd("flagTemp","flagTemp","flagClothesCloset")
    game.cmdAnd("flagTemp","flagTemp","flagToybox")
    game.cmdIfSetGoto("flagTemp","gameWin1")
+
+   game.cmdAnd("flagTemp","flagScrapbook","flagPage1")
+   game.cmdAnd("flagTemp","flagTemp","flagPage2")
+   game.cmdAnd("flagTemp","flagTemp","flagPage3")
+   game.cmdIfSetGoto("flagTemp","gameWin2")
+
    game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
 
    game.label(game.action("open window"))
@@ -339,10 +368,18 @@ def main():
 
    # Good-boy ending
    game.label("gameWin1")
-   game.cmdPrint("Mom looks around the room and starts to smile. 'Bed made, homework done, everything put away! Come here and give me a hug.'")
-   game.cmdPrint("You walk out of the room feeling proud.")
+   game.cmdPrint("Mom looks around the room and starts to smile. 'Bed made, homework done, everything put away! Come here and give me a hug. You walk out of the room feeling proud.")
    game.cmdPrint()
    game.cmdPrint("[You got the good-boy ending! But there are other ways to finish the game.]")
+   game.cmdPrint()
+   game.cmdPrint("Thanks for playing!  Goodbye.")
+   game.cmdInsert("END")
+
+   # Forgiveness ending
+   game.label("gameWin2")
+   game.cmdPrint("Your sister is standing outside of your room. You say, 'I'm sorry' and hand her the scrapbook. She looks at it and spends a long time looking at the picture of the both of you laughing. She say, 'Oh, I can't stay mad at you, come here!', and gives you a big hug.")
+   game.cmdPrint()
+   game.cmdPrint("[You got the forgiveness ending! But there are other ways to finish the game.]")
    game.cmdPrint()
    game.cmdPrint("Thanks for playing!  Goodbye.")
    game.cmdInsert("END")
