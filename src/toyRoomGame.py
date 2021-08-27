@@ -66,8 +66,7 @@ def main():
    game.cmdPrint()
    game.cmdPrint("[You got the Zork ending! But there are other ways to finish the game.]")
    game.cmdPrint()
-   game.cmdPrint("Thanks for playing!  Goodbye.")
-   game.cmdInsert("END")
+   game.cmdGoto("quit")
 
    game.label(game.action("look door"))
    game.cmdPrint("Mom probably doesn't want you to leave yet.",done)
@@ -366,43 +365,48 @@ def main():
                                  "It sticks a little, but you are able to open the window.")
    game.cmdSet("flagWindow",done)
 
+   game.label(game.action("open"))
+   game.cmdPrint("What do you want to open?",done)
+
+   game.label(game.action("open *"))
+   game.cmdPrint("Don't know how to open that.",done)
+
+
    # Good-boy ending
    game.label("gameWin1")
    game.cmdPrint("Mom looks around the room and starts to smile. 'Bed made, homework done, everything put away! Come here and give me a hug. You walk out of the room feeling proud.")
    game.cmdPrint()
    game.cmdPrint("[You got the good-boy ending! But there are other ways to finish the game.]")
    game.cmdPrint()
-   game.cmdPrint("Thanks for playing!  Goodbye.")
-   game.cmdInsert("END")
+   game.cmdGoto("quit")
 
    # Forgiveness ending
    game.label("gameWin2")
-   game.cmdPrint("Your sister is standing outside of your room. You say, 'I'm sorry' and hand her the scrapbook. She looks at it and spends a long time looking at the picture of the both of you laughing. She say, 'Oh, I can't stay mad at you, come here!', and gives you a big hug.")
+   game.cmdPrint("Your sister is standing outside of your room. You say, 'I'm sorry' and hand her the scrapbook.")
+   game.cmdPrint("She looks at it and spends a long time looking at the picture of the both of you laughing. She say, 'Oh, I can't stay mad at you, come here!', and gives you a big hug.")
    game.cmdPrint()
    game.cmdPrint("[You got the forgiveness ending! But there are other ways to finish the game.]")
    game.cmdPrint()
-   game.cmdPrint("Thanks for playing!  Goodbye.")
-   game.cmdInsert("END")
+   game.cmdGoto("quit")
 
    # Hobo ending
    game.label(game.action("exit window"))
    game.label(game.action("climb window"))
    game.label(game.action("climb out window"))
    game.cmdIfPrint("flagWindow",0,"You can't exit through a closed window.",done)
-   game.cmdPrint("You climb out the window and jump down to the grass below. You climb over the back fence and head out. Glancing back once over your shoulder you vow to never return to a home that treaty you so unfairly.")
+   game.cmdPrint("You climb out the window and jump down to the grass below. You climb over the back fence and head out. Glancing back once over your shoulder you vow to never return to a home that treated you so unfairly.")
    game.cmdPrint()
    game.cmdPrint("[You got the hobo ending! But there are other ways to finish the game.]")
    game.cmdPrint()
-   game.cmdPrint("Thanks for playing!  Goodbye.")
-   game.cmdInsert("END")
+   game.cmdGoto("quit")
 
    # Quit
    game.synonym("quit","finish")
    game.synonym("quit","end")
    game.label(game.action("quit ?game"))
-   game.label(game.action("bye"))
-   game.label(game.action("goodbye"))
-   game.cmdPrint("Goodbye.")
+
+   game.label("quit")
+   game.cmdPrint("Thanks for playing. Type RUN to play again. Goodbye.")
    game.cmdInsert("END")
 
    # Generate game
