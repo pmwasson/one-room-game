@@ -122,6 +122,7 @@ def main():
    game.label(game.action("draw ?picture"))
    game.label(game.action("draw sister"))
    game.label(game.action("draw picture of sister"))
+   game.cmdIfPrint("flagSit",0,"You can't draw a picture standing up.",done)
    game.cmdIfPrint("flagScrapbook",0,"You think about drawing a picture of your sister, but can't find any paper.",done)
    game.cmdIfPrint("flagPage1",1,"You want to redo to picture of your sister so you paste a blank page over the previous drawing.")
    game.cmdPrint("You draw a nice picture of you and your sister on page 1 of the scrapbook.")
@@ -137,6 +138,7 @@ def main():
       "Page 2 wants you to write a poem of how your sister make you feel.",done)
 
    game.label(game.action("write ?poem"))
+   game.cmdIfPrint("flagSit",0,"You can't write a poem standing up.",done)
    game.cmdIfPrint("flagScrapbook",0,"You feel like writing something, but don't have any paper.",done)
    game.cmdIfPrint("flagPage2",1,"You come up with a new idea and erase the previous poem.")
    game.cmdPrint("You don't feel like a good writer, but you make up a nice poem for your sister on page 2 of the scrapbook.")
@@ -149,13 +151,20 @@ def main():
    game.label(game.action("read scrapbook page 3"))
    game.cmdIfPrint("flagScrapbook",0,"Get the scrapbook first.",done)
    game.cmdAltPrint("flagPage2","Page 3 has the picture you found of you and your sister laughing.",
-      "Page 3 says to paste a picture you and your sister together.",done)
+      "Page 3 says to paste a photo you and your sister together.",done)
 
-   game.label(game.action("paste ?picture"))
-   game.cmdIfPrint("flagScrapbook",0,"Not sure where you would paste a picture.",done)
-   game.cmdIfPrint("flagPage3",1,"You decide you don't like the picture you found and take it out.")
-   game.cmdPrint("You dig through your desk drawer and find a good picture of you and your sister. You paste it onto page 3 of the scrapbook.")
+   game.label(game.action("paste ?photo"))
+   game.cmdIfPrint("flagScrapbook",0,"Not sure where you would paste a photo.",done)
+   game.cmdIfPrint("flagSit",0,"You can't paste a photo standing up.",done)
+   game.cmdIfPrint("flagPage3",1,"You decide you don't like the photo you found and take it out.")
+   game.cmdPrint("You dig through your desk drawer and find a good photo of you and your sister. You paste it onto page 3 of the scrapbook.")
    game.cmdSet("flagPage3",done)
+
+   game.label(game.action("look photo"))
+   game.cmdAltPrint("flagPage3","The photo shows shows you and your sister on a family vaction, laughing.","There are some photos in your desk.",done)
+
+   game.label(game.action("get photo"))
+   game.cmdPrint("You decide to leave the photos in your desk.",done)
 
    game.synonym("toys","toy")
    game.label(game.action("look toys"))
@@ -361,6 +370,7 @@ def main():
    game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
 
    game.label(game.action("open window"))
+   game.cmdGosub("autoStand")
    game.cmdAltPrint("flagWindow","The window is already openned.",
                                  "It sticks a little, but you are able to open the window.")
    game.cmdSet("flagWindow",done)
@@ -393,6 +403,7 @@ def main():
    game.label(game.action("exit window"))
    game.label(game.action("climb window"))
    game.label(game.action("climb out window"))
+   game.cmdGosub("autoStand")
    game.cmdIfPrint("flagWindow",0,"You can't exit through a closed window.",done)
    game.cmdPrint("You climb out the window and jump down to the grass below. You climb over the back fence and head out. Glancing back once over your shoulder you vow to never return to a home that treated you so unfairly.")
    game.cmdPrint()

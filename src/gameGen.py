@@ -225,15 +225,15 @@ class GameGen:
       # Top of program
       self.cmdInsert('TEXT:NORMAL:? CHR$(4);"PR#3"')
       self.cmdInsert('DIM W$({}): DIM F({})'.format(self.maxWords,self.labelStr(self.flagCount)))
-      self.cmdRem(['Flags',self.labelStr(self.flagList)])
+      #self.cmdRem(['Flags',self.labelStr(self.flagList)])
       self.cmdGoto(self.start)
 
       # Scanner
       self.label(self.scanner)
-      self.cmdInsert('V=0: FOR I=S TO LEN (A$): IF MID$(A$,I,1)=" " THEN NEXT')
+      self.cmdInsert('V=0: FOR I=S TO LEN(A$): IF MID$(A$,I,1)=" " THEN NEXT')
       self.cmdInsert('IF I > LEN (A$) THEN RETURN') 
       self.cmdInsert('S=I: FOR I=S TO LEN(A$): IF MID$(A$,I,1)<>" " THEN  NEXT') 
-      self.cmdInsert('E=I-1: V=1:RETURN')
+      self.cmdInsert('E=I-1: V=1: RETURN')
 
       # Prompt
       self.label(self.prompt)
