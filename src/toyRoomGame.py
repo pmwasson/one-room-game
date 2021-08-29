@@ -34,19 +34,19 @@ def main():
    game.synonym("help","hint")
    game.label(game.action("help"))
    game.cmdPrint("Try using 2 word commands in upper case, like LOOK ROOM or SIT CHAIR. Sometimes you may need a longer sentence like OPEN DOOR WITH KEY or LOOK UNDER BED.")
-   game.cmdPrint("Here are some word you can try: LOOK, SIT, STAND, GET, DROP, PUT, INVENTORY, OPEN, QUIT.",done)
+   game.cmdPrint("Here are some words you can try: LOOK, SIT, STAND, GET, DROP, PUT, INVENTORY, OPEN, QUIT.",done)
 
    # Look
    game.synonym("look","examine")
    game.label(game.action("look ?room"))
    game.cmdPrint("You look around your bedroom. You see a desk with some homework on it and a chair.")
-   game.cmdAltPrint("flagWindow","There is a open window which lets in a slight breeze","There is a closed window on the wall opposite of the door.")
+   game.cmdAltPrint("flagWindow","There is an open window which lets in a slight breeze.","There is a closed window on the wall opposite the door.")
    game.cmdAltPrint("flagBed","There is a bed that is neatly made.","There is a bed that is unmade with the blanket half off of it.")
    game.cmdOr("flagTemp","flagClothes","flagClothesCloset")
    game.cmdIfPrint("flagTemp",0,"A pile of clothes cover part of the floor.")
    game.cmdOr("flagTemp","flagToys","flagToybox")
    game.cmdIfPrint("flagTemp",0,"A lot of toys are piled up in the corner of the room.")
-   game.cmdPrint("There is also a toybox and a closet. There is one door but your not sure if you shouldn't leave yet.",done)
+   game.cmdPrint("There is also a toybox and a closet. There is one door but you're not sure if you should leave yet.",done)
    game.cmdIfPrint("flagSit",1,"You are sitting in the chair.")
    game.cmdIfPrint("flagSleep",1,"You are lying in bed.")
 
@@ -101,7 +101,7 @@ def main():
 
    game.label(game.action("look scrapbook"))
    game.label(game.action("read scrapbook"))
-   game.cmdAltPrint("flagScrapbook","This is a scrapbook with 3 pages that you were going to finish for your sister, but never started it.",
+   game.cmdAltPrint("flagScrapbook","This is a scrapbook with 3 pages that you were going to finish for your sister, but never started.",
       "You can't examine the scrapbook when it's holding up the desk.",done)
 
    game.label(game.action("look page"))
@@ -117,14 +117,14 @@ def main():
    game.label(game.action("read page 1"))
    game.label(game.action("read scrapbook page 1"))
    game.cmdIfPrint("flagScrapbook",0,"It is hard to read a book that you are not holding.",done)
-   game.cmdAltPrint("flagPage1","Page 1 has a pciture you drew of you and your sister.","Page 1 says to draw a picture of your sister.",done)
+   game.cmdAltPrint("flagPage1","Page 1 has a picture you drew of you and your sister.","Page 1 says to draw a picture of your sister.",done)
 
    game.label(game.action("draw ?picture"))
    game.label(game.action("draw sister"))
    game.label(game.action("draw picture of sister"))
    game.cmdIfPrint("flagSit",0,"You can't draw a picture standing up.",done)
    game.cmdIfPrint("flagScrapbook",0,"You think about drawing a picture of your sister, but can't find any paper.",done)
-   game.cmdIfPrint("flagPage1",1,"You want to redo to picture of your sister so you paste a blank page over the previous drawing.")
+   game.cmdIfPrint("flagPage1",1,"You want to redo a picture of your sister so you paste a blank page over the previous drawing.")
    game.cmdPrint("You draw a nice picture of you and your sister on page 1 of the scrapbook.")
    game.cmdSet("flagPage1",done)
 
@@ -135,7 +135,7 @@ def main():
    game.label(game.action("read scrapbook page 2"))
    game.cmdIfPrint("flagScrapbook",0,"Page 2 of what? Maybe you should be holding a book.",done)
    game.cmdAltPrint("flagPage2","Page 2 has a poem you wrote about your sister. It seems a little corny, but maybe she will like it.",
-      "Page 2 wants you to write a poem of how your sister make you feel.",done)
+      "Page 2 instructs you to write a poem of how your sister makes you feel.",done)
 
    game.label(game.action("write ?poem"))
    game.cmdIfPrint("flagSit",0,"You can't write a poem standing up.",done)
@@ -150,8 +150,8 @@ def main():
    game.label(game.action("read page 3"))
    game.label(game.action("read scrapbook page 3"))
    game.cmdIfPrint("flagScrapbook",0,"Get the scrapbook first.",done)
-   game.cmdAltPrint("flagPage2","Page 3 has the picture you found of you and your sister laughing.",
-      "Page 3 says to paste a photo you and your sister together.",done)
+   game.cmdAltPrint("flagPage3","Page 3 has the picture you found of you and your sister laughing.",
+      "Page 3 says to paste a photo of you and your sister together.",done)
 
    game.label(game.action("paste ?photo"))
    game.cmdIfPrint("flagScrapbook",0,"Not sure where you would paste a photo.",done)
@@ -161,7 +161,7 @@ def main():
    game.cmdSet("flagPage3",done)
 
    game.label(game.action("look photo"))
-   game.cmdAltPrint("flagPage3","The photo shows shows you and your sister on a family vaction, laughing.","There are some photos in your desk.",done)
+   game.cmdAltPrint("flagPage3","The photo shows shows you and your sister on a family vacation, laughing.","There are some photos in your desk.",done)
 
    game.label(game.action("get photo"))
    game.cmdPrint("You decide to leave the photos in your desk.",done)
@@ -202,7 +202,7 @@ def main():
    # Fold
    game.label(game.action("fold ?clothes"))
    game.cmdGosub("autoStand")
-   game.cmdPrint("It takes a bit of time, but you fold up all the laundry.")
+   game.cmdPrint("It takes a bit of time, but you fold all the laundry.")
    game.cmdSet("flagClothesState",done)
 
    # Put
@@ -262,7 +262,7 @@ def main():
    game.label(game.action("sleep in bed"))
    game.label(game.action("get in bed"))
    game.label(game.action("lie down"))
-   game.cmdPrint("You get into your bed and try to sleep, but you can't seem to get comfortable.")
+   game.cmdPrint("You get into your bed and try to sleep, but you are not tired.")
    game.cmdClr("flagBed")
    game.cmdSet("flagSleep",done)
 
@@ -292,7 +292,7 @@ def main():
 
    game.label(game.action("get clothes"))
    game.cmdIfPrint("flagClothesCloset",1,"The clothes are all put away, so you decide to just leave them alone.",done)
-   game.cmdAltPrint("flagClothes","You are already holding the clothes.","You pick the clothes off the floor.")
+   game.cmdAltPrint("flagClothes","You are already holding the clothes.","You pick the clothes up off the floor.")
    game.cmdSet("flagClothes",done)
 
    game.label(game.action("get toys"))
@@ -305,7 +305,7 @@ def main():
 
    game.label(game.action("get scrapbook"))
    game.cmdIfPrint("flagDesk",0,"What scrapbook?",done)
-   game.cmdAltPrint("flagScrapbook","You got the scrapbook in your hand.","You pull the scrapbook out from under the desk.")
+   game.cmdAltPrint("flagScrapbook","You have the scrapbook in your hand.","You pull the scrapbook out from under the desk.")
    game.cmdSet("flagScrapbook",done)
 
    game.label(game.action("get window"))
@@ -352,6 +352,10 @@ def main():
    game.cmdClr("flagWindow",done)
 
    # Open
+   game.label(game.action("open closet"))
+   game.cmdPrint("It is one of those closets that is always sort of opened.",done)
+
+
    game.label(game.action("open door"))
    game.label(game.action("exit ?room"))
    game.synonym("exit","leave")
@@ -367,11 +371,11 @@ def main():
    game.cmdAnd("flagTemp","flagTemp","flagPage3")
    game.cmdIfSetGoto("flagTemp","gameWin2")
 
-   game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' So you slowly close the door and go back in the room.",done)
+   game.cmdPrint("Mom says, 'I can hear the door. You can't come out yet.' You slowly close the door and go back in the room.",done)
 
    game.label(game.action("open window"))
    game.cmdGosub("autoStand")
-   game.cmdAltPrint("flagWindow","The window is already openned.",
+   game.cmdAltPrint("flagWindow","The window is already opened.",
                                  "It sticks a little, but you are able to open the window.")
    game.cmdSet("flagWindow",done)
 
@@ -393,7 +397,7 @@ def main():
    # Forgiveness ending
    game.label("gameWin2")
    game.cmdPrint("Your sister is standing outside of your room. You say, 'I'm sorry' and hand her the scrapbook.")
-   game.cmdPrint("She looks at it and spends a long time looking at the picture of the both of you laughing. She say, 'Oh, I can't stay mad at you, come here!', and gives you a big hug.")
+   game.cmdPrint("She looks at it and spends a long time looking at the picture of the both of you laughing. She says, 'Oh, I can't stay mad at you, come here!', and gives you a big hug.")
    game.cmdPrint()
    game.cmdPrint("[You got the forgiveness ending! But there are other ways to finish the game.]")
    game.cmdPrint()

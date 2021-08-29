@@ -66,7 +66,7 @@ class GameGen:
 
    def cmdPrint(self,line="",cont=True):
       self.asLines.append(self.wrapPrint(line))
-      self.doCont(cont)  
+      self.doCont(cont)
 
    def cmdRem(self,lines):
       for line in lines:
@@ -130,7 +130,7 @@ class GameGen:
       if not cont:
          result += ":" + self.gotoStr(self.prompt)
       self.asLines.append(result)
-
+    
    def replaceVariables(self,line):
       cont = True
       while(cont):
