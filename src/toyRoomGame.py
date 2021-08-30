@@ -172,7 +172,7 @@ def main():
 
    game.label(game.action("look window"))
    game.label(game.action("look out window"))
-   game.cmdAltPrint("flagScrapbook","You lean out of the open window and see the ground below you.",
+   game.cmdAltPrint("flagWindow","You lean out of the open window and see the ground below you.",
       "You look out the closed window and see your backyard.",done)
 
    game.synonym("me","self")
