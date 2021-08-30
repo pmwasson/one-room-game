@@ -1,6 +1,10 @@
 # one-room-game
  Generate a simple interactive fiction game in applesoft
 
+## Play online
+
+https://archive.org/details/toyroom_202108
+
 ## Download
 
 You can grab the latest disk image for PRODOS: https://github.com/pmwasson/one-room-game/raw/main/disk/toyroom.dsk
