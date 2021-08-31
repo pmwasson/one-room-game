@@ -278,6 +278,7 @@ def main():
    game.cmdPrint("Play with what?",done)
 
    # Get
+   game.synonym("get","take")
    game.label(game.action("get"))
    game.cmdPrint("Want do you want to get?",done)
 
