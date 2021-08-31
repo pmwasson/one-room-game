@@ -279,6 +279,7 @@ def main():
 
    # Get
    game.synonym("get","take")
+   game.synonym("get","grab")
    game.label(game.action("get"))
    game.cmdPrint("Want do you want to get?",done)
 
@@ -317,6 +318,7 @@ def main():
 
    # Drop
    game.label(game.action("drop"))
+   game.synonym("drop","throw")
    game.cmdPrint("What do you want to drop?",done)
 
    game.label(game.action("drop clothes"))
